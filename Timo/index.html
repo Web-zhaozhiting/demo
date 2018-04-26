@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>天猫商品列表-放大镜效果</title>
+	<link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+	<div class="container">
+		<div class="small-img">
+			<img src="./images/pic-01.jpg" alt="">
+			<div class="mask"></div>
+		</div>
+		<ul class="clearfix" id="list">
+			<li style="border: 2px solid #000;">
+				<img src="./images/pic-01-s.jpg" alt="">
+			</li>
+			<li>
+				<img src="./images/pic-02-s.jpg" alt="">
+			</li>
+			<li>
+				<img src="./images/pic-03-s.jpg" alt="">
+			</li>
+			<li>
+				<img src="./images/pic-04-s.jpg" alt="">
+			</li>
+			<li>
+				<img src="./images/pic-05-s.jpg" alt="">
+			</li>
+		</ul>
+		<div class="big-img">
+			<img src="./images/pic-01-b.jpg" alt="">
+		</div>
+	</div>
+	<script>
+		// 左侧小盒子图片
+		var container = document.getElementsByClassName('container')[0];
+		var smallBox = document.getElementsByClassName('small-img')[0];
+		var smallImg = smallBox.children[0]; // 小图片
+		var mask = smallBox.children[1]; // 蒙版
+		// 底部bar
+		var list = document.getElementById('list'); // ul
+		var oLi = list.getElementsByTagName('li'); // li
+		var listImg = list.getElementsByTagName('img'); // 列表图片
+		// 右侧大图片
+		var bigBox = document.getElementsByClassName('big-img')[0];
+		var bigImg = bigBox.children[0]; // 大图片
+
+		// 先做选项卡的切换效果
+		// 1-遍历底部列表 添加边框效果
+		for (let i = 0; i < oLi.length; i++) {
+			oLi[i].index = i;
+			oLi[i].onmouseover = function () {
+				for (let j = 0; j < oLi.length; j++) {
+					oLi[j].removeAttribute('style');
+				}
+				this.style.border = '2px solid #000';
+				// 改变中图的路径
+				smallImg.src = './images/pic-0' + (this.index + 1) + '.jpg';
+				if (this.index === oLi.length - 1) {
+					oLi[this.index].className = 'flag'
+					return;
+				} else {
+					for (let a = 0; a < oLi.length; a++) {
+						oLi[a].removeAttribute('class')
+					}
+				}
+				bigImg.src = "./images/pic-0" + (this.index + 1) + "-b.jpg";
+			}
+		}
+		// 2 放大镜效果
+		// 2-1 mask跟大图片的显示和隐藏
+		smallBox.onmouseover = function () {
+			for (var i = 0; i < oLi.length; i++) {
+				// 如果class = flag 就返回
+				if (oLi[i].className == "flag") {
+					return;
+				}
+			}
+			mask.style.display = 'block';
+			bigBox.style.display = 'block';
+		}
+		smallBox.onmouseout = function () {
+			mask.style.display = 'none';
+			bigBox.style.display = 'none';
+		}
+		// 2-2 让mask跟着鼠标的移动而移动
+		smallBox.onmousemove = function (e) {
+			// 获得鼠标在盒子中的位置
+			// 注意offset的定位父元素有没有设置定位
+			// 这里因为父元素 .container 有定位属性，所以要用它
+			// var maskX = e.pageX - smallBox.offsetLeft;
+			// var maskY = e.pageY - smallBox.offsetTop;
+			// 让鼠标在盒子中间，所以要把他的盒子分别向上和向右移动一半的距离
+			var maskX = e.pageX - container.offsetLeft - mask.offsetWidth / 2;
+			var maskY = e.pageY - container.offsetTop - mask.offsetHeight / 2;
+
+			// 限制盒子的最小移动距离
+			maskX = maskX < 0 ? 0 : maskX;
+			maskY = maskY < 0 ? 0 : maskY;
+			// 限制盒子的最大移动距离
+			// mask最大移动的距离 = smallBox.offsetWidth - mask.offsetWidth;
+
+			// 因为盒子都是正方形，所以只求最大的宽度就可以
+			var maskMax = smallBox.offsetWidth - mask.offsetWidth;
+			maskX = maskX > maskMax ? maskMax : maskX
+			maskY = maskY > maskMax ? maskMax : maskY
+
+			// 根据坐标来设置偏移值 
+			mask.style.left = maskX + 'px';
+			mask.style.top = maskY + 'px';
+
+			// 3~ 根据mask 同比例显示大图片(目前已知)；
+			// mask的位置 / mask最大移动的距离  = bigImg的位置 / bigImg最大移动的距离
+			// 上方除了bigImg未知？
+			// maskX/Y  / maskMax = bigImg / bigImg最大移动的距离
+			// bigImg最大移动的距离
+			var bigImgMax = bigImg.offsetWidth - bigBox.offsetWidth; // 因为盒子都是正方形，所以只求最大的宽度就可以
+			// 所以bigImg = 
+			var bigImgX = bigImgMax * maskX / maskMax;
+			var bigImgY = bigImgMax * maskY / maskMax;
+
+			bigImg.style.left = -bigImgX + 'px';
+			bigImg.style.top = -bigImgY + 'px';
+		}
+	</script>
+</body>
+
+</html>
